@@ -13,9 +13,8 @@ defmodule PetroFront.Application do
         PetroFront.Api
       ]
 
+    Logger.add_handlers(:petro_front)
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: PetroFront.Supervisor]
     Supervisor.start_link(children, opts)
   end
