@@ -21,7 +21,7 @@ defmodule PetroDB.RepoTest do
   end
 
   test "init check" do
-    IO.puts("init check db test")
+    Logger.info("init check db test")
 
     event = %Event{
       name: "test11",
@@ -39,17 +39,29 @@ defmodule PetroDB.RepoTest do
   end
 
   test "changeset ok" do
-    IO.puts("changeset ok")
+    Logger.info("changeset ok")
     map = %{"name" => "test123", "body" => "test body event", "priority" => 1}
     changeset = PetroDB.Schemas.Event.changeset(map)
     Logger.info(changeset)
   end
 
   test "changeset error" do
-    IO.puts("changeset error")
+    Logger.info("changeset error")
     map = %{"name" => "test", "body" => "test", "priority" => -1}
     changeset = PetroDB.Schemas.Event.changeset(map)
     Logger.info(changeset)
     assert nil != changeset.errors 
+  end
+
+
+  test "json decode" do
+    Logger.info("json decode")
+    payload = "{\"name\":\"test1\",\"body\":\"test body test\",\"priority\":1}"
+    {:ok, map} = JSON.decode(payload)
+    Logger.info(map)
+    changeset = Event.changeset(map)
+    Logger.info(changeset)
+    {:ok, event} = Ecto.Changeset.apply_action(changeset, :parse)
+    Logger.info(event)
   end
 end
