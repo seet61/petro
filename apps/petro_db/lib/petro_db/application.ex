@@ -1,4 +1,4 @@
-defmodule PetroAmqp.Application do
+defmodule PetroDB.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -8,14 +8,7 @@ defmodule PetroAmqp.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      PetroAmqp.Repo, 
-      :poolboy.child_spec(
-        :consumer_worker,
-        name: {:local, :consumer},
-        worker_module: PetroAmqp.Consumer,
-        size: Application.get_env(:amqp, :size, 1),
-        max_overflow: Application.get_env(:amqp, :max_overflow, 1)
-      )
+      PetroDB.Repo
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

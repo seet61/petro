@@ -8,7 +8,35 @@ config :petro, Petro.Repo,
   database: "petro_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10
+  pool_size: 5,
+  parameters: [
+    application_name: "Petro Application"
+  ]
+
+config :petro_amqp, PetroAmqp.Repo,
+  username: "petro",
+  password: "petro",
+  hostname: "192.168.1.50",
+  database: "petro_dev",
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 5,
+  parameters: [
+    application_name: "PetroAmqp Application"
+  ]
+  
+config :petro_db, PetroDB.Repo,
+  username: "petro",
+  password: "petro",
+  hostname: "192.168.1.50",
+  database: "petro_dev",
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 5,
+  parameters: [
+    application_name: "PetroDB Application"
+  ],
+  migration_default_prefix: "petro"
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
@@ -85,3 +113,10 @@ config :phoenix_live_view,
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
 config :phoenix, :stacktrace_depth, 20
+
+config :amqp,
+  connections: [
+    rabbitmq: [url: "amqp://petro:petro@192.168.1.50:5672/petro_dev"]
+  ],
+  size: 2,
+  max_overflow: 2

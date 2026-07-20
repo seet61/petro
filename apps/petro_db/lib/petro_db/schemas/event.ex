@@ -1,5 +1,5 @@
-defmodule PetroDb.Schemas.Event do
-  alias PetroDb.Schemas.Event
+defmodule PetroDB.Schemas.Event do
+  alias PetroDB.Schemas.Event
   use Ecto.Schema
   import Ecto.Changeset
 

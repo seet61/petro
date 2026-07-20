@@ -1,4 +1,4 @@
-defmodule PetroDb.MixProject do
+defmodule PetroDB.MixProject do
   use Mix.Project
 
   def project do
@@ -11,14 +11,16 @@ defmodule PetroDb.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger],
+      mod: {PetroDB.Application, []}
     ]
   end
 
@@ -27,6 +29,12 @@ defmodule PetroDb.MixProject do
     [
       {:ecto_sql, "~> 3.14"},
       {:postgrex, "~> 0.22"},
+    ]
+  end
+
+  defp aliases() do
+    [
+      test: ["ecto.create", "ecto.migrate", "test", "ecto.rollback"]
     ]
   end
 end

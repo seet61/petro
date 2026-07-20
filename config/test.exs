@@ -10,8 +10,36 @@ config :petro, Petro.Repo,
   password: "postgres",
   hostname: "localhost",
   database: "petro_test#{System.get_env("MIX_TEST_PARTITION")}",
-  pool: Ecto.Adapters.SQL.Sandbox,
-  pool_size: System.schedulers_online() * 2
+  #pool: Ecto.Adapters.SQL.Sandbox,
+  pool_size: 5,
+  parameters: [
+    application_name: "Petro Application"
+  ]
+
+config :petro_amqp, PetroAmqp.Repo,
+  username: "petro",
+  password: "petro",
+  hostname: "192.168.1.50",
+  database: "petro_test",
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 5,
+  parameters: [
+    application_name: "PetroAmqp Application"
+  ]
+  
+config :petro_db, PetroDB.Repo,
+  username: "petro",
+  password: "petro",
+  hostname: "192.168.1.50",
+  database: "petro_test",
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 5,
+  parameters: [
+    application_name: "PetroDB Application"
+  ],
+  migration_default_prefix: "petro"
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
@@ -21,7 +49,8 @@ config :petro_web, PetroWeb.Endpoint,
   server: false
 
 # Print only warnings and errors during test
-config :logger, level: :warning
+#config :logger, level: :warning
+config :logger, :default_formatter, format: "[$level] $message\n"
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
@@ -33,3 +62,10 @@ config :phoenix_live_view,
 # Sort query params output of verified routes for robust url comparisons
 config :phoenix,
   sort_verified_routes_query_params: true
+
+config :amqp,
+  connections: [
+    rabbitmq: [url: "amqp://petro:petro@192.168.1.50:5672/petro_test"]
+  ],
+  size: 5,
+  max_overflow: 5

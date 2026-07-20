@@ -13,6 +13,12 @@ import Config
 config :petro,
   ecto_repos: [Petro.Repo]
 
+config :petro_amqp,
+  ecto_repos: [PetroAmqp.Repo]
+  
+config :petro_db,
+  ecto_repos: [PetroDB.Repo]
+  
 config :petro_web,
   ecto_repos: [Petro.Repo],
   generators: [context_app: :petro]
@@ -66,3 +72,8 @@ import_config "#{config_env()}.exs"
 config :phoenix_live_view,
   # the attribute set on all root tags. Used for Phoenix.LiveView.ColocatedCSS.
   root_tag_attribute: "phx-r"
+
+config :amqp,
+  channels: [
+    rabbitmq_channel: [connection: :rabbitmq]
+  ]
