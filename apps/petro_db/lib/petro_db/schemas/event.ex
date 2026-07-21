@@ -4,6 +4,7 @@ defmodule PetroDB.Schemas.Event do
   import Ecto.Changeset
 
   @schema_prefix "petro"
+  @derive {JSON.Encoder, only: [:name, :body, :priority]}
 
   schema "events" do
     field(:name, :string)

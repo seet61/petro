@@ -29,7 +29,8 @@ defmodule PetroAmqp.MixProject do
       {:ecto_sql, "~> 3.14"},
       {:postgrex, "~> 0.22"},
       {:amqp, "~> 4.1"},
-      {:poolboy, "~> 1.5"}
+      {:poolboy, "~> 1.5"},
+      {:petro_db, in_umbrella: true}
     ]
   end
 end
