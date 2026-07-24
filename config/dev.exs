@@ -119,4 +119,5 @@ config :amqp,
     rabbitmq: [url: "amqp://petro:petro@192.168.1.50:5672/petro_dev"]
   ],
   size: 2,
-  max_overflow: 2
+  max_overflow: 2,
+  prefetch_count: 5
