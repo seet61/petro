@@ -18,50 +18,50 @@ defmodule PetroAmqp.Consumer do
     {:ok, %{}}
   end
 
-  def handle_info({:subscribe}, state) do
-    Logger.info("Consumer #{inspect(self())} :subscribe state: #{inspect(state)}")
+  def handle_info({:subscribe}, channel) do
+    Logger.debug("Consumer #{inspect(self())} :subscribe channel: #{inspect(channel)}")
     case subscribe() do
-      {:ok, channel} ->
-        {:noreply, Map.put(state, :channel, channel)}
+      {:ok, chan} ->
+        {:noreply, Map.put(channel, :channel, chan)}
       _ ->
-        {:noreply, state}
+        {:noreply, channel}
     end
   end
   
-  def handle_info({:DOWN, _, :process, pid, reason}, %{channel: %{pid: pid}} = state) do
+  def handle_info({:DOWN, _, :process, pid, reason}, %{channel: %{pid: pid}} = channel) do
     Logger.error("Consumer #{inspect(self())} :DOWN reason: #{inspect(reason)}")
     send(self(), {:subscribe})
-    {:noreply, Map.put(state, :channel, nil)}
+    {:noreply, Map.put(channel, :channel, nil)}
   end
 
   # Confirmation from broker after consume
-  def handle_info({:basic_consume_ok, %{consumer_tag: _consumer_tag}}, state) do
-    {:noreply, state}
+  def handle_info({:basic_consume_ok, %{consumer_tag: _consumer_tag}}, channel) do
+    {:noreply, channel}
   end
 
   # Send by broker if unexpected error, like queue deleted
-  def handle_info({:basic_cancel, %{consumer_tag: _consumer_tag}}, state) do
-    {:stop, :normal, state}
+  def handle_info({:basic_cancel, %{consumer_tag: _consumer_tag}}, channel) do
+    {:stop, :normal, channel}
   end
 
   # Send by broker normal cancel
-  def handle_info({:basic_cancel_ok, %{consumer_tag: _consumer_tag}}, state) do
-    {:stop, :normal, state}
+  def handle_info({:basic_cancel_ok, %{consumer_tag: _consumer_tag}}, channel) do
+    {:stop, :normal, channel}
   end
 
   # Normal delivering
   def handle_info(
         {:basic_deliver, payload, %{delivery_tag: tag, redelivered: redelivered}},
-        state
+        channel
       ) do
-    consume(state, tag, redelivered, payload)
-    {:noreply, state}
+    consume(channel, tag, redelivered, payload)
+    {:noreply, channel}
   end
 
   defp subscribe() do
     case AMQP.Application.get_channel(:rabbitmq_channel) do
       {:ok, channel} ->
-        Logger.info("Consumer #{inspect(self())} channel is opened")
+        Logger.debug("Consumer #{inspect(self())} channel is opened")
         Process.monitor(channel.pid)
         setup_queue(channel)
         :ok = Basic.qos(channel, prefetch_count: Application.get_env(:amqp, :prefetch_count, 10))
@@ -94,23 +94,17 @@ defmodule PetroAmqp.Consumer do
   end
 
   defp consume(channel, tag, _redelivered, payload) do
-    Logger.debug("process: #{inspect(self())} message: #{inspect(payload)}")
+    Logger.debug("process: #{inspect(self())} message: #{inspect(payload)} channel: #{inspect(channel)} tag: #{inspect(tag)}")
     with {:ok, map} <- JSON.decode(payload),
       changeset <- Event.changeset(map),
       {:ok, event} <- Ecto.Changeset.apply_action(changeset, :parse) do
         Repo.insert!(event)
-        Logger.debug("event with name #{event.name} saved")
-        :ok = Basic.ack(channel,tag)
-    else 
-      {:error, %Ecto.Changeset{} = changeset} ->
-        Logger.error(changeset.errors)
-        :ok = Basic.reject(channel, tag, requeue: false)
-      {:error, %JSON.DecodeError{} = json_error} ->
-        Logger.error(json_error)
-        :ok = Basic.reject(channel, tag, requeue: false)
-      _ -> 
-        Logger.error("default error at with")
-        :ok = Basic.reject(channel, tag, requeue: false)
+        Logger.debug("event with name #{event.name} was saved")
+        :ok = AMQP.Basic.ack(channel.channel, tag)
     end
+  rescue
+    exception ->
+      Logger.error("exception: #{inspect(exception)}")
+      :ok = AMQP.Basic.reject(channel.channel, tag, requeue: false)
   end
 end
