@@ -22,7 +22,7 @@ defmodule PetroAmqp.Consumer do
     Logger.debug("Consumer #{inspect(self())} :subscribe channel: #{inspect(channel)}")
     case subscribe() do
       {:ok, chan} ->
-        {:noreply, Map.put(channel, :channel, chan)}
+        {:noreply, chan}
       _ ->
         {:noreply, channel}
     end
@@ -100,11 +100,11 @@ defmodule PetroAmqp.Consumer do
       {:ok, event} <- Ecto.Changeset.apply_action(changeset, :parse) do
         Repo.insert!(event)
         Logger.debug("event with name #{event.name} was saved")
-        :ok = AMQP.Basic.ack(channel.channel, tag)
+        :ok = AMQP.Basic.ack(channel, tag)
     end
   rescue
     exception ->
       Logger.error("exception: #{inspect(exception)}")
-      :ok = AMQP.Basic.reject(channel.channel, tag, requeue: false)
+      :ok = AMQP.Basic.reject(channel, tag, requeue: false)
   end
 end
