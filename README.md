@@ -14,5 +14,5 @@ This is an Elixir umbrella project. It is composed of multiple apps:
 
 * [Petro](apps/petro) - The core logic for web
 * [PetroWeb](apps/petro_web) - The Phoenix web interface
-* [PetroAmqp](apps/petro_amqp) - The backend logic foe RabbitMQ
+* [PetroAmqp](apps/petro_amqp) - The backend logic for RabbitMQ
 * [PetroDB](apps/petro_db) - The abstract layer for DataBase entities
