@@ -12,15 +12,7 @@ Ready to run in production? Please [check our deployment guides](https://phoenix
 
 This is an Elixir umbrella project. It is composed of multiple apps:
 
-* [Petro](apps/petro) - The core logic
+* [Petro](apps/petro) - The core logic for web
 * [PetroWeb](apps/petro_web) - The Phoenix web interface
-
-Each app has its own README and configuration.
-
-## Learn more
-
-* Official website: https://www.phoenixframework.org/
-* Guides: https://phoenix.hexdocs.pm/overview.html
-* Docs: https://phoenix.hexdocs.pm
-* Forum: https://elixirforum.com/c/phoenix-forum
-* Source: https://github.com/phoenixframework/phoenix
+* [PetroAmqp](apps/petro_amqp) - The backen logic foe RabbitMQ
+* [PetroDB](apps/petro_db) - The asbtrack layer for DataBase entities
